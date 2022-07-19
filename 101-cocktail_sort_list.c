@@ -1,30 +1,90 @@
 #include "sort.h"
-#include <stdio.h>
 
 /**
- * bubble_sort - sorts an array in ascending order
- * @array: array of ints to sort
- * @size: size of the array
+ * list_len - function returns length of list
+ * @list: head of list
+ *
+ * Return: length
  */
-void bubble_sort(int *array, size_t size)
+size_t list_len(listint_t *list)
 {
-	unsigned int i, j;
-	int tmp;
+	size_t len = 0;
 
-	if (size < 2)
-		return;
-
-	for (i = 0; i < size; i++)
+	while (list)
 	{
-		for (j = 0; j < size - i - 1; j++)
+		len++;
+		list = list->next;
+	}
+	return (len);
+}
+
+/**
+ * switch_nodes - function swaps nodes at pointer p with the following node
+ * @list: head of list
+ * @p: pointer to node
+ */
+void switch_nodes(listint_t **list, listint_t **p)
+{
+	listint_t *one, *two, *three, *four;
+
+	one = (*p)->prev;
+	two = *p;
+	three = (*p)->next;
+	four = (*p)->next->next;
+	two->next = four;
+	if (four)
+		four->prev = two;
+	three->next = two;
+	three->prev = two->prev;
+	if (one)
+		one->next = three;
+	else
+		*list = three;
+	two->prev = three;
+	*p = three;
+}
+
+/**
+ *  cocktail_sort_list - function sorts a doubly linked list using
+ * the cocktail sort algorithm
+ * @list: pointer to list
+ */
+void cocktail_sort_list(listint_t **list)
+{
+	listint_t *p;
+	int sorted = 0;
+
+	if (!list || !*list || list_len(*list) < 2)
+		return;
+	p = *list;
+	while (!sorted)
+	{
+		sorted = 1;
+		while (p->next)
 		{
-			if  (array[j] > array[j + 1])
+			if (p->n > p->next->n)
 			{
-				tmp = array[j];
-				array[j] = array[j + 1];
-				array[j + 1] = tmp;
-				print_array(array, size);
+				sorted = 0;
+				switch_nodes(list, &p);
+				print_list(*list);
 			}
+			else
+				p = p->next;
+		}
+		if (sorted)
+			break;
+		p = p->prev;
+		while (p->prev)
+		{
+			if (p->n < p->prev->n)
+			{
+				sorted = 0;
+				p = p->prev;
+				switch_nodes(list, &p);
+				print_list(*list);
+			}
+			else
+				p = p->prev;
 		}
 	}
 }
